@@ -1,0 +1,18 @@
+name: challenge-ens
+channels:
+  - defaults
+  - conda-forge
+  - hcc
+dependencies:
+  - python=3.7
+  - pillow=8.0.1
+  - numpy=1.19.2
+  - matplotlib=3.3.2
+  - ipython=5.8.0
+  - pandas=1.1.3
+  - jupyter=1.0.0
+  - tifffile=2020.11.18
+  - tqdm=4.51.0
+  - tensorflow=2.0.0
+
+prefix: /home/sid/miniconda3/envs/challenge-ens
