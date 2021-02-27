@@ -17,6 +17,10 @@ from dataset import parse_image, load_image_train, load_image_test
 from model import UNet
 from tensorflow_utils import plot_predictions
 from utils import YamlNamespace
+import os
+
+
+os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
 class PlotCallback(tf.keras.callbacks.Callback):
     """A callback used to display sample predictions during training."""
@@ -38,7 +42,7 @@ class PlotCallback(tf.keras.callbacks.Callback):
         if self.ipython_mode:
             self.clear_output(wait=True)
         if self.save_folder:
-            save_filepaths = [self.save_folder/f'plot_{n}_epoch{epoch}.png' for n in range(1, self.num+1)]
+            save_filepaths = [self.save_folder+'/'+f'epoch{epoch}_plot_{n}.png' for n in range(1, self.num+1)]
         else:
             save_filepaths = None
         plot_predictions(self.model, self.dataset, self.sample_batch, num=self.num, save_filepaths=save_filepaths)
@@ -65,7 +69,9 @@ def _parse_args():
 if __name__ == '__main__':
 
     import multiprocessing
-
+    print("GPUs : ", tf.config.experimental.list_physical_devices('GPU'))
+    print("___________________________________")
+    
     config = _parse_args()
     print(f'Config:\n{config}')
     # set random seed for reproducibility
@@ -97,9 +103,9 @@ if __name__ == '__main__':
         trainset_size = len(train_files) - valset_size
 
     train_dataset = tf.data.Dataset.from_tensor_slices(list(map(str, train_files)))\
-        .map(parse_image, num_parallel_calls=N_CPUS)
+        .map(parse_image)#, num_parallel_calls=N_CPUS)
     val_dataset = tf.data.Dataset.from_tensor_slices(list(map(str, val_files)))\
-        .map(parse_image, num_parallel_calls=N_CPUS)
+        .map(parse_image)#, num_parallel_calls=N_CPUS)
 
     train_dataset = train_dataset.map(load_image_train, num_parallel_calls=N_CPUS)\
         .shuffle(buffer_size=1024, seed=config.seed)\
@@ -113,30 +119,38 @@ if __name__ == '__main__':
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     # where to write files for this experiments
+    '''
     xp_dir = config.xp_rootdir / datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
     (xp_dir/'tensorboard').mkdir(parents=True)
     (xp_dir/'plots').mkdir()
     (xp_dir/'checkpoints').mkdir()
+    '''
+    
+    xp_dir = os.path.join(config.xp_rootdir, datetime.datetime.now().strftime("%d-%m-%Y_%H:%M:%S") + '/')
+    os.mkdir(xp_dir)
+    os.mkdir(os.path.join(xp_dir, 'tensorboard'))
+    os.mkdir(os.path.join(xp_dir, 'plots'))
+    os.mkdir(os.path.join(xp_dir, 'checkpoints'))
     # save the validation samples to a CSV
     val_samples_s = pd.Series([int(f.stem) for f in val_files], name='sample_id', dtype='uint32')
-    val_samples_s.to_csv(xp_dir/'val_samples.csv', index=False)
+    val_samples_s.to_csv(xp_dir +'val_samples.csv', index=False)
 
     # keep a training minibatch for visualization
     for image, mask in train_dataset.take(1):
         sample_batch = (image[:5, ...], mask[:5, ...])
 
     callbacks = [
-        PlotCallback(sample_batch=sample_batch, save_folder=xp_dir/'plots', num=5),
+        PlotCallback(sample_batch=sample_batch, save_folder=xp_dir +'plots', num=5),
         tf.keras.callbacks.TensorBoard(
-            log_dir=xp_dir/'tensorboard',
+            log_dir=xp_dir +'tensorboard',
             update_freq='epoch'
         ),
         # tf.keras.callbacks.EarlyStopping(patience=10, verbose=1),
         tf.keras.callbacks.ModelCheckpoint(
-            filepath=xp_dir/'checkpoints/epoch{epoch}', save_best_only=False, verbose=1
+            filepath=xp_dir +'checkpoints/epoch{epoch}', save_best_only=False, verbose=1
         ),
         tf.keras.callbacks.CSVLogger(
-            filename=(xp_dir/'fit_logs.csv')
+            filename=(xp_dir +'fit_logs.csv')
         ),
         tf.keras.callbacks.ReduceLROnPlateau(
             patience=20,
@@ -159,8 +173,8 @@ if __name__ == '__main__':
 
     # compute class weights for the loss: inverse-frequency balanced
     # note: we set to 0 the weights for the classes "no_data"(0) and "clouds"(1) to ignore these
-    class_weight = (1 / LCD.TRAIN_CLASS_COUNTS[2:])* LCD.TRAIN_CLASS_COUNTS[2:].sum() / (LCD.N_CLASSES-2)
-    class_weight[LCD.IGNORED_CLASSES_IDX] = 0.
+    class_weight = np.zeros(10)
+    class_weight[2:] = (1 / LCD.TRAIN_CLASS_COUNTS[2:])* LCD.TRAIN_CLASS_COUNTS[2:].sum() / (LCD.N_CLASSES-2)
     print(f"Will use class weights: {class_weight}")
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
@@ -180,4 +194,3 @@ if __name__ == '__main__':
                               validation_steps=valset_size // config.batch_size,
                               class_weight=class_weight
                               )
-

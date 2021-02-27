@@ -1,0 +1,2 @@
+gt_file,pred_file,score
+/usr/users/gpusdi1/gpusdi1_5/Documents/LandCover_Preligens/train_labels_GY1QjFw.csv,/usr/users/gpusdi1/gpusdi1_5/Documents/LandCover_Preligens/code/experiments/27-02-2021_13:00:59/epoch84_train_predicted.csv,0.0051213956408354315
