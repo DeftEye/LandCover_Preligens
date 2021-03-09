@@ -13,9 +13,10 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 import tensorflow as tf
+from train import custom_KLD
 
-from framework.dataset import LandCoverData as LCD
-from framework.utils import YamlNamespace
+from dataset import LandCoverData as LCD
+from utils import YamlNamespace
 
 def numpy_parse_image(image_path):
     """Load an image as numpy array
@@ -100,6 +101,7 @@ def _parse_args():
         config.xp_dir = Path(max(str(d) for d in config.xp_rootdir.iterdir() if d.is_dir()))
     else:
         config.xp_dir = config.xp_rootdir/config.xp_name
+    print(config.xp_dir)
     assert config.xp_dir.is_dir()
     assert config.set in ('train', 'test', 'val')
 
@@ -147,7 +149,17 @@ if __name__ == '__main__':
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     # Load the trained model saved to disk
-    model = tf.keras.models.load_model(str(config.xp_dir/f'checkpoints/epoch{config.checkpoint_epoch}'))
+    model = tf.keras.models.load_model(str(config.xp_dir/f'checkpoints/epoch{config.checkpoint_epoch}'),
+                                                           custom_objects = {"custom_KLD" : custom_KLD},
+                                                           compile = False)
+    
+    
+    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
+    optimizer = tf.keras.optimizers.Adam(lr=config.lr)
+
+    #model.compile(optimizer=optimizer,
+    #              loss=loss,
+    #              metrics=[custom_KLD], run_eagerly=True)
 
     print(f"Predict the vectors over the {config.set} dataset")
     y_pred = predict_as_vectors(model, test_dataset, steps=testset_size // config.batch_size)

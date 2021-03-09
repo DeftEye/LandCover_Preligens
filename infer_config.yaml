@@ -5,7 +5,9 @@
 
 # the random seed, for reproducibility
 # set to null for no random seed
-seed: 42
+seed: 4
+# the learning rate
+lr: 0.001
 # the size of each batch of images when performing prediction
 batch_size: 32
 # the path to the root folder of the dataset
@@ -14,10 +16,10 @@ dataset_folder: '~/Documents/LandCover_Preligens/dataset'
 xp_rootdir: '~/Documents/LandCover_Preligens/code/experiments'
 # the name of log directory for an experiment (result of training)
 # you can set to 'last' to refer to the lastly created directory under in <xp_rootdir>
-xp_name: '25-11-2020_20:40:43'
+xp_name: '06-03-2021_10:34:21'
 # the set to perform inference on: 'train', 'test' or 'val'
 # note: 'train' mean all train samples with the ones in validation excluded, and 'val' mean the ones in validation
-set: 'test'
+set: 'val'
 # the output prediction for the set will be saved to a file 'epoch<checkpoint_epoch>_<set>_predicted.csv' in the experiment directory
 # the epoch number for the model checkpoint to load and perform prediction with
-checkpoint_epoch: 84
+checkpoint_epoch: 86

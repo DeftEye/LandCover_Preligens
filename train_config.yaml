@@ -4,11 +4,13 @@
 #
 
 # the random seed, for reproducibility
+#The number of fold for the cross validation
+num_folds: 5
 # if null, no random seed
 seed: 42
 # the size of each batch of images when training
 # careful not to use a too large batch size, might lead to OOM errors
-batch_size: 32
+batch_size: 16
 # the number of epochs to train for
 epochs: 90
 # the learning rate
