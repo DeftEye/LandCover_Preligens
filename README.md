@@ -4,23 +4,23 @@ This is our git for resolving the ENS challenge data : https://challengedata.ens
 ## Presentation of the git :
 
 ### First look at the files and folders.
--`environment.yml`: Contain all the conda dependencies for this project.  
+-`environment.yml`: Contains all the conda dependencies for this project.  
 -`infer_config.yaml` and `train_config.yaml` : Config files for the prediction and the train.  
 -`train_images.csv` and `test_images.csv` : Contain the ID of the train and test dataset.  
--`train_labels.csv` : Contain the true class proportion for every images in the train dataset  
--`code/experiments/` : Contain the result of the training, prediction and evaluation in separate folders named after the date of the start of the train.  
+-`train_labels.csv` : Contains the true proportion of classes for every images in the train dataset  
+-`code/experiments/` : Contains the result of the training, prediction and evaluation in separate folders named after the date of the start of the train.  
 -`data_vizualization.ipynb` : Jupyter notebook in order to see and understand the data.  
 -`custom_metric.py` : Small function in order to compute the Kullback-Leibler Divergence between two csv files.  
 -`sample_dataset/` : Folder with a subset of the whole dataset in order to test our work. The real dataset should have the same organization inside the folder as this one and the folder should be named "dataset"  
--`framework/` :  Contain the code for this project.  
+-`framework/` :  Contains the code for this project.  
 
 ### Deeper look into framework/
 In this folder you will find :  
--`utils.py`, `dataset.py` and `tensorflow_utils.py` : Those files respectively contain usefull functions for yaml files, loading the dataset or manipulate tensor.  
+-`utils.py`, `dataset.py` and `tensorflow_utils.py` : Those files respectively contain usefull functions for yaml files, for loading the dataset and for manipulating tensors.  
 -`model.py` : This file is used to create a model based on the UNet architecture.  
--`train.py` : Load the data, create a model and train it with the parameters in train_config.yaml then save it for later.  
--`infer.py` : Load the model and make a prediction using the parameters in infer_config.yaml then save the prediction for later.  
--`eval.py` : Load the prediction and evaluate them using the Kullback-Leibler Divergence and save the score.  
+-`train.py` : Loads the data, creates a model and trains it with the parameters in train_config.yaml then saves it for later.  
+-`infer.py` : Loads the model and makes a prediction using the parameters in infer_config.yaml then saves the prediction for later.  
+-`eval.py` : Loads the prediction and evaluates them using the Kullback-Leibler Divergence and saves the score.  
 
 ## Follow this part to make the code work :
 ### Virtual Env
@@ -50,7 +50,7 @@ Then we activate it :
   The xp_file is last per default but you can choose an older training to make your prediction by modifying the line in the config file.  
 `python3 framework/infer.py --config infer_config.yaml`
  
- This will create a file in code/experiments/{date}/ named epoch{nb}_{set}_predicted.csv containing for every image of the set their ID and the proportion of the ten classes.  
+ This will create a file in code/experiments/{date}/ named epoch{nb}_{set}_predicted.csv that contains for every image of the set their ID and the proportion of the ten classes.  
 
 ### Evaluation :
 In order to evaluate our model we should run the following command line : (This will work only for val and train dataset as we dont have the label for the test)  
