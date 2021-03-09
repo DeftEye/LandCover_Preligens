@@ -16,7 +16,7 @@ dataset_folder: '~/Documents/LandCover_Preligens/dataset'
 xp_rootdir: '~/Documents/LandCover_Preligens/code/experiments'
 # the name of log directory for an experiment (result of training)
 # you can set to 'last' to refer to the lastly created directory under in <xp_rootdir>
-xp_name: 'last'
+xp_name: '06-03-2021_10:34:21'
 # the set to perform inference on: 'train', 'test' or 'val'
 # note: 'train' mean all train samples with the ones in validation excluded, and 'val' mean the ones in validation
 set: 'val'

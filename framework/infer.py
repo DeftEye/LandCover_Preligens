@@ -157,9 +157,9 @@ if __name__ == '__main__':
     loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
     optimizer = tf.keras.optimizers.Adam(lr=config.lr)
 
-    #model.compile(optimizer=optimizer,
-    #              loss=loss,
-    #              metrics=[custom_KLD], run_eagerly=True)
+    model.compile(optimizer=optimizer,
+                  loss=loss,
+                  metrics=[custom_KLD], run_eagerly=True)
 
     print(f"Predict the vectors over the {config.set} dataset")
     y_pred = predict_as_vectors(model, test_dataset, steps=testset_size // config.batch_size)
