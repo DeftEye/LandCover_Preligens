@@ -14,5 +14,7 @@ dependencies:
   - tifffile=2020.11.18
   - tqdm=4.51.0
   - tensorflow=2.0.0
-
+  - yaml=0.2.5
+  - pyyaml=5.4.1
+  
 prefix: /home/sid/miniconda3/envs/challenge-ens
