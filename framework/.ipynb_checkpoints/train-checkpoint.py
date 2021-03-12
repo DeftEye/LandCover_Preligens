@@ -20,7 +20,7 @@ from tensorflow_utils import plot_predictions
 from utils import YamlNamespace
 import os
 
-
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 os.environ["TF_CPP_MIN_LOG_LEVEL"]="3"
 
 
@@ -51,7 +51,7 @@ def custom_KLD(y_true, y_pred):
                                       minlength=LCD.N_CLASSES, axis=-1)
     true_counts = true_counts / tf.math.reduce_sum(true_counts, -1, keepdims=True)
         
-    score = np.mean(np.sum((true_counts + e )* np.log((true_counts + e) / (pred_counts+e)),axis = 1))
+    score = np.mean(np.sum((true_counts + e) * np.log((true_counts + e)/(pred_counts+e)), axis = 1))
 
     return score
     

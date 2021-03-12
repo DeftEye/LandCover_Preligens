@@ -33,6 +33,10 @@ Then we activate it :
  (challenge-ens) should appear at the left of your terminal if everything is going correctly.
  
 ### Training : 
+
+ Don't forget to modify line 19 and 22 in the train_config.yaml with the correct path to the git folder.  
+ You can also change sample_dataset to dataset (If you named the total dataset this way) to train on the whole dataset.  
+ 
  Then we train the model with this command : 
  
  `python3 framework/train.py --config train_config.yaml`
@@ -44,10 +48,14 @@ Then we activate it :
  You can change the train dataset in the config file to sample_dataset in order to train on a subsample of the dataset if it is taking too much time.
 
 ### Prediction : 
+
+ Don't forget to modify line 14 and 16 in the infer_config.yaml with the correct path to the git folder.  
+ You must use the same dataset folder that you used for the training otherwith you'll have some errors.  
+ You can choose the model you want, or the set you want to predict in the infer_config.yaml file by modifying the lines 19 or 22.  
+ The xp_file is last per default but you can choose an older training to make your prediction by modifying the line in the config file.    
+   
  When the training is over we can predict the class distribution for the images with :  
- 
-  You can choose the model you want, or the set you want to predict in the infer_config.yaml file by modifying the according parameter.  
-  The xp_file is last per default but you can choose an older training to make your prediction by modifying the line in the config file.  
+
 `python3 framework/infer.py --config infer_config.yaml`
  
  This will create a file in code/experiments/{date}/ named epoch{nb}_{set}_predicted.csv that contains for every image of the set their ID and the proportion of the ten classes.  
