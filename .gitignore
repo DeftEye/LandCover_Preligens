@@ -1,5 +1,5 @@
 ./code/*
 ./__MACOSX/*
 ./dataset/*
-./framework/train_kfold
-./framework/train_kldloss
+./framework/train_kfold.py
+./framework/train_kldloss.py
