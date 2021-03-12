@@ -1,6 +1,5 @@
 ./code/*
 ./__MACOSX/*
 ./dataset/*
-./framework/train_gridsearch
 ./framework/train_kfold
 ./framework/train_kldloss

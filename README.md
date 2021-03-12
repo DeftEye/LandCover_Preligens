@@ -22,8 +22,13 @@ In this folder you will find :
 -`infer.py` : Loads the model and makes a prediction using the parameters in infer_config.yaml then saves the prediction for later.  
 -`eval.py` : Loads the prediction and evaluates them using the Kullback-Leibler Divergence and saves the score.  
 
-## Follow this part to make the code work :
-### Virtual Env
+
+## How to download the whole dataset :
+Go to https://challengedata.ens.fr/participants/challenges/48/ then on the right in the Files section click on supplementary files.  
+This might takes some time depending on your internet connection as you will download a 7Go TAR GZIP folder (14Go when unzipped with the whole dataset).  
+  
+## Follow this part to make the code work :  
+### Virtual Env  
 First we set up a virtual env using conda :  
  `conda env create -f environment.yml`
  
