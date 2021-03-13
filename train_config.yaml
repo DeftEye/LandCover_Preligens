@@ -14,13 +14,13 @@ batch_size: 16
 # the number of epochs to train for
 epochs: 90
 # the learning rate
-lr: 0.005
+lr: 0.001
 # the path to the root directory of the dataset
 dataset_folder: '~/Documents/LandCover_Preligens/dataset'
 # the path to the root directory used to store experiments
 # a directory per experiment will be created named with the datetime during execution
 xp_rootdir: '~/Documents/LandCover_Preligens/code/experiments'
 # CSV file containing the samples to use in the validation set
-# if null, a random train/val split is performed, with 10% of the samples held out for validation
+# if null, a random train/val split is performed, with 25% of the samples held out for validation
 # the validation samples will be saved to a file 'val_samples.csv' in the experiment directory
 val_samples_csv: null
