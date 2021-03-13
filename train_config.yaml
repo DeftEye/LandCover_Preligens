@@ -14,7 +14,7 @@ batch_size: 16
 # the number of epochs to train for
 epochs: 90
 # the learning rate
-lr: 0.0075
+lr: 0.005
 # the path to the root directory of the dataset
 dataset_folder: '~/Documents/LandCover_Preligens/dataset'
 # the path to the root directory used to store experiments

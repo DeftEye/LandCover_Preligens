@@ -90,6 +90,7 @@ def numpy_parse_image(image_path):
 def parse_image(image_path):
     """Wraps the parse_image function as a TF function"""
     image, mask = tf.numpy_function(numpy_parse_image, (image_path,), (tf.uint16, tf.uint8))
+
     image.set_shape([LandCoverData.IMG_SIZE, LandCoverData.IMG_SIZE, LandCoverData.N_CHANNELS])
     mask.set_shape([LandCoverData.IMG_SIZE, LandCoverData.IMG_SIZE, 1])
     return image, mask

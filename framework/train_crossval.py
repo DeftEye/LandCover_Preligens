@@ -127,21 +127,63 @@ if __name__ == '__main__':
     print('Instanciate train and validation datasets')
     train_files = list(config.dataset_folder.glob('train/images/*.tif'))
     # shuffle list of training samples files
-    train_files = random.sample(train_files, len(train_files)//6)
+    train_files = random.sample(train_files, len(train_files))
     devset_size = len(train_files)
     trainset_size = len(train_files)
+    
+    train1 = train_files[:int(trainset_size*0.8)]
+    train2 = train_files[int(trainset_size*0.2):]
+    train3 = train_files[:int(trainset_size*0.2)] + train_files[int(trainset_size*0.4):]
+    train4 = train_files[:int(trainset_size*0.4)] + train_files[int(trainset_size*0.6):]
+    train5 = train_files[:int(trainset_size*0.6)] + train_files[int(trainset_size*0.8):]
+
+    val1 = train_files[int(trainset_size*0.8):]
+    val2 = train_files[:int(trainset_size*0.2)]
+    val3 = train_files[int(trainset_size*0.2):int(trainset_size*0.4)]
+    val4 = train_files[int(trainset_size*0.4):int(trainset_size*0.6)]
+    val5 = train_files[int(trainset_size*0.6):int(trainset_size*0.8)]
+    
+    trainset_size = len(train1)
+    valset_size = len(val1)
 
 
+
+    
+    def map_train_dataset(train_files):    
+        train_dataset = tf.data.Dataset.from_tensor_slices(list(map(str, train_files)))\
+            .map(parse_image, num_parallel_calls=N_CPUS)
+        train_dataset = train_dataset.map(load_image_train, num_parallel_calls=N_CPUS)\
+            .shuffle(buffer_size=1024, seed=config.seed)\
+            .repeat()\
+            .batch(config.batch_size)\
+            .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        return train_dataset
+
+    def map_val_dataset(val_files):
+        val_dataset = tf.data.Dataset.from_tensor_slices(list(map(str, val_files)))\
+            .map(parse_image, num_parallel_calls=N_CPUS)
+        val_dataset = val_dataset.map(load_image_test, num_parallel_calls=N_CPUS)\
+            .repeat()\
+            .batch(config.batch_size)\
+            .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        return( val_dataset)
         
         
-    train_dataset = tf.data.Dataset.from_tensor_slices(list(map(str, train_files)))\
-        .map(parse_image, num_parallel_calls=N_CPUS)
-    
-    
-    train_dataset = train_dataset.map(load_image_train, num_parallel_calls=N_CPUS)\
-        .shuffle(buffer_size=1024, seed=config.seed)\
-        .batch(config.batch_size)\
-        .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+    train_data1 = map_train_dataset(train1)
+    train_data2 = map_train_dataset(train2)
+    train_data3 = map_train_dataset(train3)
+    train_data4 = map_train_dataset(train4)
+    train_data5 = map_train_dataset(train5)
+
+    val_data1 = map_val_dataset(val1)
+    val_data2 = map_val_dataset(val2)
+    val_data3 = map_val_dataset(val3)
+    val_data4 = map_val_dataset(val4)
+    val_data5 = map_val_dataset(val5)
+
+
+
+
     
 
     # Where to write files for this experiments
@@ -153,21 +195,10 @@ if __name__ == '__main__':
     
     
     
-    # Décommenter les 5 lignes suivantes pour enregistrer des images avec le True mask et le Pred mask à chaque epoch 
-    # Attention cela ralenti beaucoup le modèle
-    
-    #for image, mask in train_dataset.take(1):
-        #sample_batch = (image[:5, ...], mask[:5, ...])
-    #callbacks = [    
-        #PlotCallback(sample_batch=sample_batch, save_folder=xp_dir +'plots', num=5),
-                #tf.keras.callbacks.TensorBoard(log_dir=xp_dir +'tensorboard',update_freq='epoch'),
+
             
         
-    callbacks = [ # Commenter cette ligne si le block précédent a été décommenté
-        tf.keras.callbacks.EarlyStopping(patience=10, verbose=1),
-        tf.keras.callbacks.ModelCheckpoint(filepath=xp_dir +'checkpoints/epoch{epoch}', save_best_only=False, verbose=0),
-        tf.keras.callbacks.CSVLogger(filename=(xp_dir +'fit_logs.csv')),
-        tf.keras.callbacks.ReduceLROnPlateau(patience=20,factor=0.5,verbose=1,)]
+
     
     
     
@@ -176,7 +207,6 @@ if __name__ == '__main__':
                         num_classes=LCD.N_CLASSES,
                         num_layers=2)
     
-    '''
     print(f"Creating U-Net with arguments: {unet_kwargs}")
     model = UNet(**unet_kwargs)
     print(model.summary())
@@ -189,49 +219,8 @@ if __name__ == '__main__':
                     loss=loss,
                     metrics=[custom_KLD],
                     run_eagerly=True) # Needed to transform tensor to np.array in the custom metric
-    '''
+    
         
-        
-    def build_model(l_r = config.lr):
-        print(f"Creating U-Net with arguments: {unet_kwargs}")
-        model = UNet(**unet_kwargs)
-        
-        print("Compile model")
-        model.compile(optimizer=tf.keras.optimizers.Adam(l_r),
-                        loss=loss,
-                        metrics=[custom_KLD],
-                        run_eagerly=True) # Needed to transform tensor to np.array in the custom metric
-        return model
-    
-    
-    estimator = KerasClassifier(build_model) 
-    param_grid = {'l_r' : np.linspace(0.00001,0.001, 11)} 
-    
-    grid = GridSearchCV(estimator = estimator, param_grid = param_grid, cv = config.num_folds) 
-    
-    
-    
-
-    
-
-    import time
-    start = time.time()
-    
-    inputs = tf.Variable(np.empty((0,256, 256, 4), dtype=np.float32))
-    targets = tf.Variable(np.empty((0,256, 256, 1), dtype=np.uint8))
-    for x,y in train_dataset:
-        inputs = tf.concat([inputs,x], axis = 0)
-        targets = tf.concat([targets,y], axis = 0)
-        #print(inputs.shape)
-        
-    print(time.time() - start)
-    
-    print(inputs.shape)
-
-
-
-    grid_result = grid.fit(inputs, targets) # COPYPASTA
-    print("The best learning rate is : ", grid_result.best_params_) # COPYPASTA
 
 
 
@@ -244,10 +233,30 @@ if __name__ == '__main__':
     
 
     # Launch training
-    model_history = model.fit(train_dataset, epochs=config.epochs,
-                              callbacks=callbacks,
-                              steps_per_epoch= trainset_size // config.batch_size,
-                              validation_data=val_dataset,
-                              validation_steps=valset_size // config.batch_size,
-                              class_weight=class_weight
-                              )
+    dataset = ((train_data1,val_data1),(train_data2,val_data2),(train_data3,val_data3),(train_data4,val_data4),(train_data5,val_data5))
+    i = 1
+    for train, val in dataset:
+        # Décommenter les 5 lignes suivantes pour enregistrer des images avec le True mask et le Pred mask à chaque epoch 
+        # Attention cela ralenti beaucoup le modèle
+    
+        #for image, mask in train_dataset.take(1):
+            #sample_batch = (image[:5, ...], mask[:5, ...])
+        #callbacks = [    
+            #PlotCallback(sample_batch=sample_batch, save_folder=xp_dir +'plots', num=5),
+                    #tf.keras.callbacks.TensorBoard(log_dir=xp_dir +'tensorboard',update_freq='epoch'),
+                
+        callbacks = [ # Commenter cette ligne si le block précédent a été décommenté
+        tf.keras.callbacks.EarlyStopping(patience=5, verbose=1),
+        tf.keras.callbacks.ModelCheckpoint(filepath=xp_dir +'checkpoints/set' + str(i) + 'epoch{epoch}', save_best_only=True, verbose=0),
+        tf.keras.callbacks.CSVLogger(filename=(xp_dir +'fit_logs_set' + str(i) +'.csv')),
+        tf.keras.callbacks.ReduceLROnPlateau(patience=20,factor=0.5,verbose=1,)]
+        
+        print("Training for set number : ", i)
+        model_history = model.fit(train, epochs=config.epochs,
+                                  callbacks=callbacks,
+                                  steps_per_epoch= trainset_size // config.batch_size,
+                                  validation_data=val,
+                                  validation_steps=valset_size // config.batch_size,
+                                  class_weight=class_weight
+                                  )
+        i +=1

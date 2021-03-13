@@ -18,7 +18,8 @@ This is our git for resolving the ENS challenge data : https://challengedata.ens
 In this folder you will find :  
 -`utils.py`, `dataset.py` and `tensorflow_utils.py` : Those files respectively contain usefull functions for yaml files, for loading the dataset and for manipulating tensors.  
 -`model.py` : This file is used to create a model based on the UNet architecture.  
--`train.py` : Loads the data, creates a model and trains it with the parameters in train_config.yaml then saves it for later.  
+-`train.py` : Loads the data, creates a model and trains it with the parameters in train_config.yaml then saves it for later. 
+-`train_crossval`: Cross validation implemented from scratch allowing us to evaluate the mean performance of our model depending on the hyperparameters in order to tune them.  
 -`infer.py` : Loads the model and makes a prediction using the parameters in infer_config.yaml then saves the prediction for later.  
 -`eval.py` : Loads the prediction and evaluates them using the Kullback-Leibler Divergence and saves the score.  
 
