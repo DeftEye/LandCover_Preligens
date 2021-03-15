@@ -239,11 +239,13 @@ if __name__ == '__main__':
         # Décommenter les 5 lignes suivantes pour enregistrer des images avec le True mask et le Pred mask à chaque epoch 
         # Attention cela ralenti beaucoup le modèle
     
+    
         #for image, mask in train_dataset.take(1):
             #sample_batch = (image[:5, ...], mask[:5, ...])
         #callbacks = [    
             #PlotCallback(sample_batch=sample_batch, save_folder=xp_dir +'plots', num=5),
                     #tf.keras.callbacks.TensorBoard(log_dir=xp_dir +'tensorboard',update_freq='epoch'),
+                
                 
         callbacks = [ # Commenter cette ligne si le block précédent a été décommenté
         tf.keras.callbacks.EarlyStopping(patience=10, monitor='val_custom_KLD', verbose=1),

@@ -8,24 +8,24 @@ This is our git for resolving the ENS challenge data : https://challengedata.ens
 -`infer_config.yaml` and `train_config.yaml` : Config files for the prediction and the train.  
 -`train_images.csv` and `test_images.csv` : Contain the ID of the train and test dataset.  
 -`train_labels.csv` : Contains the true proportion of classes for every images in the train dataset  
--`code/experiments/` : Contains the result of the training, prediction and evaluation in separate folders named after the date of the start of the train.  
+-`code/experiments/` : Contains the result of the training, prediction and evaluation in separate folders named after the date of the start of the train. You will find the checkpoint of the model at every epoch in `checkpoint`, 5 images with their true mask and their predicted mask at every epoch, the prediction on the training, validation and test dataset as well as the score of the prediction, the ID of the images in the validation dataset in `val_samples.csv`and the loss of the model at every epoch. In our latest version you won't find the plots as we deleted them to train faster but you'll find the metric KLD in `fit_logs.cs`.  
 -`data_vizualization.ipynb` : Jupyter notebook in order to see and understand the data.  
 -`custom_metric.py` : Small function in order to compute the Kullback-Leibler Divergence between two csv files.  
 -`sample_dataset/` : Folder with a subset of the whole dataset in order to test our work. The real dataset should have the same organization inside the folder as this one and the folder should be named "dataset"  
 -`framework/` :  Contains the code for this project.  
 
-### Deeper look into framework/
+### Deeper look into framework/  
 In this folder you will find :  
 -`utils.py`, `dataset.py` and `tensorflow_utils.py` : Those files respectively contain usefull functions for yaml files, for loading the dataset and for manipulating tensors.  
 -`model.py` : This file is used to create a model based on the UNet architecture.  
--`train.py` : Loads the data, creates a model and trains it with the parameters in train_config.yaml then saves it for later. 
+-`train.py` : Loads the data, creates a model and trains it with the parameters in train_config.yaml then saves it for later.  
 -`train_crossval`: Cross validation implemented from scratch allowing us to evaluate the mean performance of our model depending on the hyperparameters in order to tune them.  
 -`infer.py` : Loads the model and makes a prediction using the parameters in infer_config.yaml then saves the prediction for later.  
 -`eval.py` : Loads the prediction and evaluates them using the Kullback-Leibler Divergence and saves the score.  
 
 
 ## How to download the whole dataset :
-Go to https://challengedata.ens.fr/participants/challenges/48/ then on the right in the Files section click on supplementary files.  
+Go to https://challengedata.ens.fr/participants/challenges/48/, you will need to connect before downloading the data, then on the right in the Files section click on supplementary files.  
 This might takes some time depending on your internet connection as you will download a 7Go TAR GZIP folder (14Go when unzipped with the whole dataset).  
   
 ## Follow this part to make the code work :  
@@ -64,7 +64,9 @@ Then we activate it :
 
 `python3 framework/infer.py --config infer_config.yaml`
  
- This will create a file in code/experiments/{date}/ named epoch{nb}_{set}_predicted.csv that contains for every image of the set their ID and the proportion of the ten classes.  
+ This will create a file in code/experiments/{date}/ named epoch{nb}_{set}_predicted.csv that contains for every image of the set their ID and the proportion of the ten classes.   
+ 
+ Not that usefull anymore as we have added the KLD directly in the training of the model, however you still need to infer on the test set to get the file you will submit to the challenge.
 
 ### Evaluation :
 In order to evaluate our model we should run the following command line : (This will work only for val and train dataset as we dont have the label for the test)  
