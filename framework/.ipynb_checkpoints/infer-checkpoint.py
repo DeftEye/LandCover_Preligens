@@ -149,7 +149,7 @@ if __name__ == '__main__':
         .prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
 
     # Load the trained model saved to disk
-    model = tf.keras.models.load_model(str(config.xp_dir/f'checkpoints/epoch{config.checkpoint_epoch}'),
+    model = tf.keras.models.load_model(str(config.xp_dir/f'checkpoints/set1epoch{config.checkpoint_epoch}'),
                                                            custom_objects = {"custom_KLD" : custom_KLD},
                                                            compile = False)
     

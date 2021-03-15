@@ -206,21 +206,6 @@ if __name__ == '__main__':
     unet_kwargs = dict( input_shape=(LCD.IMG_SIZE, LCD.IMG_SIZE, LCD.N_CHANNELS),
                         num_classes=LCD.N_CLASSES,
                         num_layers=2)
-    
-    print(f"Creating U-Net with arguments: {unet_kwargs}")
-    model = UNet(**unet_kwargs)
-    print(model.summary())
-
-    # get optimizer, loss, and compile model for training
-    optimizer = tf.keras.optimizers.Adam(lr=config.lr)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
-    print("Compile model")
-    model.compile(optimizer=optimizer,
-                    loss=loss,
-                    metrics=[custom_KLD],
-                    run_eagerly=True) # Needed to transform tensor to np.array in the custom metric
-    
-        
 
 
 
@@ -236,6 +221,21 @@ if __name__ == '__main__':
     dataset = ((train_data1,val_data1),(train_data2,val_data2),(train_data3,val_data3),(train_data4,val_data4),(train_data5,val_data5))
     i = 1
     for train, val in dataset:
+        
+        print(f"Creating U-Net with arguments: {unet_kwargs}")
+        model = UNet(**unet_kwargs)
+        #print(model.summary())
+
+        # get optimizer, loss, and compile model for training
+        optimizer = tf.keras.optimizers.Adam(lr=config.lr)
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)
+        print("Compile model")
+        model.compile(optimizer=optimizer,
+                        loss=loss,
+                        metrics=[custom_KLD],
+                        run_eagerly=True) # Needed to transform tensor to np.array in the custom metric
+        
+        
         # Décommenter les 5 lignes suivantes pour enregistrer des images avec le True mask et le Pred mask à chaque epoch 
         # Attention cela ralenti beaucoup le modèle
     
@@ -246,10 +246,10 @@ if __name__ == '__main__':
                     #tf.keras.callbacks.TensorBoard(log_dir=xp_dir +'tensorboard',update_freq='epoch'),
                 
         callbacks = [ # Commenter cette ligne si le block précédent a été décommenté
-        tf.keras.callbacks.EarlyStopping(patience=5, verbose=1),
-        tf.keras.callbacks.ModelCheckpoint(filepath=xp_dir +'checkpoints/set' + str(i) + 'epoch{epoch}', save_best_only=True, verbose=0),
+        tf.keras.callbacks.EarlyStopping(patience=10, monitor='val_custom_KLD', verbose=1),
+        tf.keras.callbacks.ModelCheckpoint(filepath=xp_dir +'checkpoints/set' + str(i) + 'epoch{epoch}', monitor='val_custom_KLD',                                            save_best_only=True, verbose=0),
         tf.keras.callbacks.CSVLogger(filename=(xp_dir +'fit_logs_set' + str(i) +'.csv')),
-        tf.keras.callbacks.ReduceLROnPlateau(patience=20,factor=0.5,verbose=1,)]
+        tf.keras.callbacks.ReduceLROnPlateau(patience=5, monitor='val_custom_KLD',factor=0.5,verbose=1,)]
         
         print("Training for set number : ", i)
         model_history = model.fit(train, epochs=config.epochs,
@@ -257,6 +257,5 @@ if __name__ == '__main__':
                                   steps_per_epoch= trainset_size // config.batch_size,
                                   validation_data=val,
                                   validation_steps=valset_size // config.batch_size,
-                                  class_weight=class_weight
-                                  )
+                                  class_weight=class_weight)
         i +=1

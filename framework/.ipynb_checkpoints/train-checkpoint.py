@@ -189,7 +189,7 @@ if __name__ == '__main__':
             
         
     callbacks = [ # Commenter cette ligne si le block précédent a été décommenté
-        tf.keras.callbacks.EarlyStopping(patience=10, verbose=1),
+        tf.keras.callbacks.EarlyStopping(patience=15, verbose=1),
         tf.keras.callbacks.ModelCheckpoint(filepath=xp_dir +'checkpoints/epoch{epoch}', save_best_only=False, verbose=0),
         tf.keras.callbacks.CSVLogger(filename=(xp_dir +'fit_logs.csv')),
         tf.keras.callbacks.ReduceLROnPlateau(patience=20,factor=0.5,verbose=1,)]
