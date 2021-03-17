@@ -74,3 +74,9 @@ In order to evaluate our model we should run the following command line : (This 
 `python3 framework/eval.py --gt-file train_label.csv --pred-file code/experiments/{date}/epoch{nb}_{set}_predicted.csv -o code/experiments/{date}/epoch{nb}_{set}_predicted_score.csv`
     
 In order to evaluate on the test set we must submit the epoch{nb}_test_predicted.csv file in the according section at the following url https://challengedata.ens.fr/participants/challenges/48/
+
+
+
+### Best results : 17/03
+
+The best KLD achieved on the test set is 0,0425 it is due to the averaged prediction of 5 Unets trained with the same learning rate, 0,002, with the callbacks present in the file `train_crossval.py`.

@@ -248,7 +248,7 @@ if __name__ == '__main__':
                 
                 
         callbacks = [ # Commenter cette ligne si le block précédent a été décommenté
-        tf.keras.callbacks.EarlyStopping(patience=10, monitor='val_custom_KLD', verbose=1),
+        tf.keras.callbacks.EarlyStopping(patience=20, monitor='val_custom_KLD', verbose=1),
         tf.keras.callbacks.ModelCheckpoint(filepath=xp_dir +'checkpoints/set' + str(i) + 'epoch{epoch}', monitor='val_custom_KLD',                                            save_best_only=True, verbose=0),
         tf.keras.callbacks.CSVLogger(filename=(xp_dir +'fit_logs_set' + str(i) +'.csv')),
         tf.keras.callbacks.ReduceLROnPlateau(patience=5, monitor='val_custom_KLD',factor=0.5,verbose=1,)]
